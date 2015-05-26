@@ -51,10 +51,9 @@ static NSString *const oscarWilde = @"Oscar Wilde";
       .alignItems = CKStackLayoutAlignItemsStretch
     }
     children:{
-      {[CKOverlayLayoutComponent
-        newWithComponent:[QuoteComponent newWithQuote:quote context:context]
-        overlay:overlay]},
-      {hairlineComponent()}
+      {[QuoteComponent newWithQuote:quote context:context]},
+      {hairlineComponent()},
+      {overlay}
     }]];
   if (c) {
     c->_overlay = overlay;
@@ -84,22 +83,14 @@ static CKComponent *hairlineComponent()
   }];
 }
 
-- (std::vector<CKComponentAnimation>)animationsFromPreviousComponent:(InteractiveQuoteComponent *)previousComponent
+- (CKComponentBoundsAnimation)boundsAnimationFromPreviousComponent:(CKComponent *)previousComponent
 {
-  if (previousComponent->_overlay == nil && _overlay != nil) {
-    return {{_overlay, scaleToAppear()}}; // Scale the overlay in when it appears.
-  } else {
-    return {};
-  }
-}
-
-static CAAnimation *scaleToAppear()
-{
-  CABasicAnimation *scale = [CABasicAnimation animationWithKeyPath:@"transform"];
-  scale.fromValue = [NSValue valueWithCATransform3D:CATransform3DMakeScale(0.0, 0.0, 0.0)];
-  scale.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
-  scale.duration = 0.2;
-  return scale;
+    return {
+        .mode = CKComponentBoundsAnimationModeSpring,
+        .duration = 0.4,
+        .springDampingRatio = 0.7,
+        .springInitialVelocity = 1.0,
+    };
 }
 
 @end
